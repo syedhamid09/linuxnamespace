@@ -1,0 +1,18 @@
+FROM alpine as build
+
+# Install build tools
+RUN apk add --no-cache build-base 
+
+# Copy source into build stage
+COPY receiver.c /tmp
+
+# Build rcv binary
+RUN cd /tmp                    && \
+    gcc -o rcv receiver.c -lrt
+
+FROM alpine
+
+# Copy built binary from build stage
+COPY --from=build /tmp/rcv /usr/local/bin
+
+ENTRYPOINT ["rcv"]
